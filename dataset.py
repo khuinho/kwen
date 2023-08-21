@@ -46,7 +46,7 @@ class KwenDataset(Dataset):
         if self.transform is not None:
             img = self.transform(img)
 
-        if self.lstm is not None:
+        if self.lstm:
             lat_loc = self.img_list[idx].split('_')[0]+'_'+self.img_list[idx].split('_')[1]
             
             wqi_vals = list(self.wqi_score[lat_loc].values())
@@ -60,6 +60,6 @@ class KwenDataset(Dataset):
             wqi = collate_fn(wqi_pre, 32)
 
             
-            return  label, wqi
+            return  img, wqi, label
         else:
             return img, label

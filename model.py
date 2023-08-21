@@ -40,11 +40,11 @@ class RNNNet(nn.Module):
         self.hidden_size = hidden_size
         self.bidirectional = True
         self.rnn = torch.nn.LSTM(self.input_size, self.hidden_size, dropout = 0, batch_first = True, bidirectional = self.bidirectional)
-        self.linear3 = nn.Linear(16*(int(self.bidirectional)+1), num_classes)
+        self.linear = nn.Linear(16*(int(self.bidirectional)+1), num_classes)
 
     def forward(self, x):
         x, (hidden_state, cell_state) = self.rnn(x)
-        x = self.linear3(x)
+        x = self.linear(x)
         return x
     
 
