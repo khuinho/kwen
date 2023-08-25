@@ -1,1 +1,5 @@
 .jpg
+data/images/*.jpg
+data/
+*.jpg
+runs/
