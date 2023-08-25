@@ -1,5 +1,10 @@
 .jpg
+<<<<<<< HEAD
 data/images/*.jpg
 data/
 *.jpg
 runs/
+=======
+dataset/img
+runs
+>>>>>>> e7ac9e826bf597435d2fdfbbb3eb8f5a95e7db08
