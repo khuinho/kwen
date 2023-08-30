@@ -34,7 +34,7 @@ from torchsummary import summary
 
 # lstm 분류기 
 class RNNNet(nn.Module):
-    def __init__(self, input_size,num_classes, hidden_size = 16,init_weights=True):
+    def __init__(self, input_size,num_classes, hidden_size = 2,init_weights=True):
         super().__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -145,6 +145,8 @@ class MobileNet(nn.Module):
         self.conv7 = nn.Sequential(
             Depthwise(int(1024*alpha), int(1024*alpha), stride=2)
         )
+        # lstm
+        self.lstm = RNNNet()
         # linear
         self.avg_pool = nn.AdaptiveAvgPool2d((1,1))
         self.linear = nn.Linear(int(1024*alpha), 256)
@@ -162,7 +164,21 @@ class MobileNet(nn.Module):
         if self.init_weights:
             self._initialize_weights()
 
-    def forward(self, x):
+    def forward(self, x_wqi):
+        x, x_ = x_wqi[0]
+        x_ = x_wqi[1]
+        x_ = self.lstm(x_)
+        
+        print('#'*50)
+        print('type img\n')
+        print(type(x))
+        print('\n')
+        print('#'*50)
+        print('type wqi\n')
+        print(type(x_))
+        print('\n')
+        
+        
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
@@ -177,7 +193,7 @@ class MobileNet(nn.Module):
         x, (hidden_state, cell_state) = self.rnn(x)
         x = self.linear3(x)
         #return torch.argmax(x, dim=1)
-        return x
+        return [x, x_]
     
     # weights initialization function
     def _initialize_weights(self):
