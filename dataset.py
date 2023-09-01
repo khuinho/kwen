@@ -60,10 +60,6 @@ class KwenDataset(Dataset):
             wqi = collate_fn(wqi_pre, 32)
 
             
-<<<<<<< HEAD
-            return  wqi, img, label
-=======
-            return  img, wqi, label
->>>>>>> e7ac9e826bf597435d2fdfbbb3eb8f5a95e7db08
+            return   img,wqi, label 
         else:
             return img, label

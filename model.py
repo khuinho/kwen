@@ -34,17 +34,17 @@ from torchsummary import summary
 
 # lstm 분류기 
 class RNNNet(nn.Module):
-    def __init__(self, input_size,num_classes, hidden_size = 2,init_weights=True):
+    def __init__(self, input_size,num_classes, hidden_size = 16, init_weights=True):
         super().__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.bidirectional = True
         self.rnn = torch.nn.LSTM(self.input_size, self.hidden_size, dropout = 0, batch_first = True, bidirectional = self.bidirectional)
-        self.linear = nn.Linear(16*(int(self.bidirectional)+1), num_classes)
+        self.linear3 = nn.Linear(16*(int(self.bidirectional)+1), num_classes)
 
     def forward(self, x):
         x, (hidden_state, cell_state) = self.rnn(x)
-        x = self.linear(x)
+        x = self.linear3(x)
         return x
     
 
@@ -115,6 +115,8 @@ class MobileNet(nn.Module):
         super().__init__()
         self.init_weights=init_weights
         alpha = width_multiplier
+        
+        self.num_classes = num_classes
 
         self.conv1 = BasicConv2d(3, int(32*alpha), 3, stride=2, padding=1)
         self.conv2 = Depthwise(int(32*alpha), int(64*alpha), stride=1)
@@ -145,12 +147,10 @@ class MobileNet(nn.Module):
         self.conv7 = nn.Sequential(
             Depthwise(int(1024*alpha), int(1024*alpha), stride=2)
         )
-        # lstm
-        self.lstm = RNNNet()
         # linear
         self.avg_pool = nn.AdaptiveAvgPool2d((1,1))
         self.linear = nn.Linear(int(1024*alpha), 256)
-        #self.linear2 = nn.Linear( 256, 16)
+        self.linear2 = nn.Linear( 256, 16)
 
 
         # lstm
@@ -158,26 +158,22 @@ class MobileNet(nn.Module):
         self.hidden_size = 16
         self.bidirectional = True
         self.rnn = torch.nn.LSTM(self.input_size, self.hidden_size, dropout = 0, batch_first = True, bidirectional = self.bidirectional)
-        self.linear3 = nn.Linear(16*(int(self.bidirectional)+1), num_classes)
+        self.lstm = RNNNet(input_size=32, num_classes=8, hidden_size = 16, init_weights=True)
+        self.linear3 = nn.Linear(16*(int(self.bidirectional)+1), self.num_classes)
+        self.linear4 = nn.Linear(24,self.num_classes)
         
         # weights initialization
         if self.init_weights:
             self._initialize_weights()
 
-    def forward(self, x_wqi):
-        x, x_ = x_wqi[0]
-        x_ = x_wqi[1]
+    def forward(self, data):
+        print(self.num_classes)
+       
+        x_ = data[1] 
         x_ = self.lstm(x_)
         
-        print('#'*50)
-        print('type img\n')
-        print(type(x))
-        print('\n')
-        print('#'*50)
-        print('type wqi\n')
-        print(type(x_))
-        print('\n')
         
+        x = data[0]
         
         x = self.conv1(x)
         x = self.conv2(x)
@@ -189,11 +185,10 @@ class MobileNet(nn.Module):
         x = self.avg_pool(x)
         x = x.view(x.size(0), -1)
         x = self.linear(x)
-        #x = self.linear2(x)
-        x, (hidden_state, cell_state) = self.rnn(x)
-        x = self.linear3(x)
-        #return torch.argmax(x, dim=1)
-        return [x, x_]
+        x = self.linear2(x)
+        x = torch.cat((x, x_), dim=1)
+        x = self.linear4(x)
+        return x
     
     # weights initialization function
     def _initialize_weights(self):

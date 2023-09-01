@@ -15,6 +15,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchsummary import summary
 from torch import optim
+from model import *
 
 # dataset and transformation
 from torchvision import datasets
@@ -22,17 +23,14 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 import os
 
-# display images
-from torchvision import utils
-import matplotlib.pyplot as plt
-
 # utils
 import numpy as np
 from torchsummary import summary
 import time
 import copy
 from torch.utils.tensorboard import SummaryWriter
-from model import *
+from dataset import *
+
 
 writer = SummaryWriter()
 losss = {}
