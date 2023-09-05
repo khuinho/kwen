@@ -167,7 +167,6 @@ class MobileNet(nn.Module):
             self._initialize_weights()
 
     def forward(self, data):
-        print(self.num_classes)
        
         x_ = data[1] 
         x_ = self.lstm(x_)
@@ -204,6 +203,16 @@ class MobileNet(nn.Module):
                 nn.init.normal_(m.weight, 0, 0.01)
                 nn.init.constant_(m.bias, 0)
 
+class testNet(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.num_classes = num_classes
+        self.linear = nn.Linear(32,self.num_classes)
+        
+    def forward(self, x):
+        x = self.linear(x)
+        return x
+        
 def mobilenet(alpha=1, num_classes=1):
     return MobileNet(alpha, num_classes)
             
