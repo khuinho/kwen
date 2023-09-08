@@ -2,7 +2,7 @@ import json
 import os
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
-import tensorboard
+
 
 
 
@@ -13,13 +13,15 @@ def collate_fn(wqi, data_size):
     len_0 = data_size - len_wqi
     if len_wqi != data_size:
         padd = [0 for _ in range(len_0)]
-    
-    result = padd + wqi
-    return result
+        result = padd + wqi
+        result = result[data_size*-1:]
+        return result
+    else:
+        return wqi
 
 class KwenDataset(Dataset):
     
-    def __init__(self, path, train=True, transform=None, lstm = None):
+    def __init__(self, path, len_wqi, train=True, transform=None, lstm = None):
         self.path = path
         self.img_list = os.listdir(os.path.join(path,'img'))
         self.transform = transform
@@ -29,6 +31,8 @@ class KwenDataset(Dataset):
         
         with open(os.path.join(path, 'wqi_score_sorted.json'), 'r') as f:
             self.wqi_score = json.load(f)
+        
+        self.len_wqi = len_wqi
         
     def __len__(self):
         return len(self.img_list)
@@ -53,11 +57,12 @@ class KwenDataset(Dataset):
             wqi_key = wqi_vals.index(label)
             wqi_pre = wqi_vals[:wqi_key+1]
 
-            if len(wqi_pre) >=30:
-                wqi_pre = wqi_pre[-30:]
+            if len(wqi_pre) >=self.len_wqi:
+                wqi_pre = wqi_pre[-1 * self.len_wqi:]
+                
             else: pass
             
-            wqi = collate_fn(wqi_pre, 32)
+            wqi = collate_fn(wqi_pre, self.len_wqi)
 
             
             return   img,wqi, label 

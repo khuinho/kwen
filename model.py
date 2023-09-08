@@ -40,13 +40,15 @@ class RNNNet(nn.Module):
         self.hidden_size = hidden_size
         self.bidirectional = True
         self.rnn = torch.nn.LSTM(self.input_size, self.hidden_size, dropout = 0, batch_first = True, bidirectional = self.bidirectional)
-        self.linear3 = nn.Linear(16*(int(self.bidirectional)+1), num_classes)
+        self.linear3 = nn.Linear(self.input_size*(int(self.bidirectional)+1), num_classes)
 
     def forward(self, x):
         x, (hidden_state, cell_state) = self.rnn(x)
         x = self.linear3(x)
         return x
     
+
+
 
 
 class SEBlock(nn.Module):
@@ -155,12 +157,12 @@ class MobileNet(nn.Module):
 
         # lstm
         self.input_size = 256
-        self.hidden_size = 16
+        self.hidden_size = 8
         self.bidirectional = True
         self.rnn = torch.nn.LSTM(self.input_size, self.hidden_size, dropout = 0, batch_first = True, bidirectional = self.bidirectional)
-        self.lstm = RNNNet(input_size=32, num_classes=8, hidden_size = 16, init_weights=True)
+        self.lstm = RNNNet(input_size=8, num_classes=4, hidden_size = 8, init_weights=True)
         self.linear3 = nn.Linear(16*(int(self.bidirectional)+1), self.num_classes)
-        self.linear4 = nn.Linear(24,self.num_classes)
+        self.linear4 = nn.Linear(20,self.num_classes)
         
         # weights initialization
         if self.init_weights:
