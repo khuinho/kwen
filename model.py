@@ -52,7 +52,8 @@ class RNNNet(nn.Module):
 
 
 class SEBlock(nn.Module):
-    def __init__(self, in_channels, r=16):
+    def __init__(self, in_channels, r=164
+                 ):
         super().__init__()
         self.squeeze = nn.AdaptiveAvgPool2d((1,1))
         self.excitation = nn.Sequential(
@@ -135,11 +136,11 @@ class MobileNet(nn.Module):
         # down sample
         self.conv5 = nn.Sequential(
             Depthwise(int(256*alpha), int(512*alpha), stride=2),
-            Depthwise(int(512*alpha), int(512*alpha), stride=1),
-            Depthwise(int(512*alpha), int(512*alpha), stride=1),
-            Depthwise(int(512*alpha), int(512*alpha), stride=1),
-            Depthwise(int(512*alpha), int(512*alpha), stride=1),
-            Depthwise(int(512*alpha), int(512*alpha), stride=1),
+            #Depthwise(int(512*alpha), int(512*alpha), stride=1),
+            #Depthwise(int(512*alpha), int(512*alpha), stride=1),
+            #Depthwise(int(512*alpha), int(512*alpha), stride=1),
+            #Depthwise(int(512*alpha), int(512*alpha), stride=1),
+            #Depthwise(int(512*alpha), int(512*alpha), stride=1),
         )
         # down sample
         self.conv6 = nn.Sequential(
@@ -209,7 +210,7 @@ class testNet(nn.Module):
     def __init__(self, num_classes):
         super().__init__()
         self.num_classes = num_classes
-        self.linear = nn.Linear(32,self.num_classes)
+        self.linear = nn.Linear(8,self.num_classes)
         
     def forward(self, x):
         x = self.linear(x)
